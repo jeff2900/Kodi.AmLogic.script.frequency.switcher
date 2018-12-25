@@ -18,8 +18,8 @@ class fsPlayer(xbmc.Player):
 
             if fsconfig.radioOnPlayStart:
 
-                # retry this up to 20 times - for slow DVD-ISO play-back (20 x 0.4s = 8 seconds max)
-                for retryCounter in range(0, 20):
+                # retry this up to 100 times - for slow DVD-ISO play-back (100 x 0.4s = 40 seconds max)
+                for retryCounter in range(0, 100):
 
                     # set the output mode automatically
                     setModeStatus, statusType = fsutil.setDisplayModeAuto()

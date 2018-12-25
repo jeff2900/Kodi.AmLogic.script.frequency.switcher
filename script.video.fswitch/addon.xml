@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.frequency.switcher" name="Frequency Switcher" version="2.1.0" provider-name="pmos69">
+<addon id="script.frequency.switcher" name="Frequency Switcher" version="2.1.1" provider-name="pmos69">
   <requires>
     <import addon="xbmc.python" version="2.14.0"/>
 	<import addon="script.module.pyxbmct" version="1.1.2"/>

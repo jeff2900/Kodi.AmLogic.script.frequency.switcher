@@ -16,4 +16,4 @@ Kodi uses information in that virtual file to determine valid resolutions/refres
 Submited PR to Kodi to support manual override of "disp_cap" to try to circumvent the issue: https://github.com/xbmc/xbmc/pull/7257
 
 ### Screenshot
-<img src="pictures/Screenshot01.png" alt="screenshot" title="screenshot" width="400" height="350" /> <img src="pictures/Screenshot02.png" alt="screenshot" title="screenshot" width="400" height="350" /> <img src="pictures/Screenshot03.png" alt="screenshot" title="screenshot" width="400" height="350" /><br><br>
+<img src="pictures/Screenshot01.png" alt="screenshot" title="screenshot" width="400" height="350" /> <img src="pictures/Screenshot02.png" alt="screenshot" title="screenshot" width="400" height="350" /> <img src="pictures/Screenshot03.png" alt="screenshot" title="screenshot" width="400" height="350" /> <img src="pictures/Screenshot04.png" alt="screenshot" title="screenshot" width="400" height="350" /><br><br>

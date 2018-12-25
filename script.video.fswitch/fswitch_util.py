@@ -127,7 +127,7 @@ def getSourceFPS():
     else:
         videoFPSValue = None
 
-    # xbmc.log("MyNOTICE = videoFPSValue : " + videoFPSValue)
+    # xbmc.log("script.frequency.switcher - getSourceFPS(): videoFPSValue = " + videoFPSValue,level=xbmc.LOGNOTICE)
     return videoFileName, videoFPSValue
 
 def getPlatformType():
@@ -230,8 +230,6 @@ def getDisplayModeFileStatus():
         try:
             subprocess.call(["su", "root", "chmod", "666", "/sys/class/display/mode"])
             subprocess.call(["su", "root", "chmod", "666", "/sys/class/amhdmitx/amhdmitx0/hdcp_mode"])
-            subprocess.call(["su", "root", "chmod", "666", "/sys/class/video/contrast"])
-            subprocess.call(["su", "root", "chmod", "666", "/sys/class/video/brightness"])
         except:
             pass
 
@@ -345,9 +343,12 @@ def setDisplayMode(newOutputMode):
                     setModeStatus = 'Frequency changed to ' + newFreq
                     statusType = 'info'
 
-        with open("/sys/class/amhdmitx/amhdmitx0/hdcp_mode", 'w') as modeFileamhdmitx:
-            modeFileamhdmitx.write('11')
-					
+        try:
+            with open("/sys/class/amhdmitx/amhdmitx0/hdcp_mode", 'w') as modeFileamhdmitx:
+                modeFileamhdmitx.write('11')
+        except:
+            pass
+
     return setModeStatus, statusType
 
 def getCurrentFPS():
@@ -383,9 +384,12 @@ def getCurrentFPS():
         
         # FPS detected
         else:
-                
+            #xbmc.log("script.frequency.switcher: getCurrentFPS: videoFPSValue     = " + videoFPSValue,level=xbmc.LOGNOTICE)
+            #xbmc.log("script.frequency.switcher: getCurrentFPS: videoFileNameLog  = " + videoFileNameLog,level=xbmc.LOGNOTICE)
+            #xbmc.log("script.frequency.switcher: getCurrentFPS: videoFileNamePlay = " + videoFileNamePlay,level=xbmc.LOGNOTICE)
+
             # log file name doesn't match currently playing video
-            if videoFileNameLog != videoFileNamePlay:
+            if (videoFileNameLog != videoFileNamePlay) and (videoFileNameLog[0:6] != 'pvr://' ) and (videoFileNameLog[0:9] != 'plugin://' ):
                 setModeStatus = 'Found source framerate for wrong video file.'
                 statusType = 'warn'
         
