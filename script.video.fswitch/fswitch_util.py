@@ -116,7 +116,7 @@ def getSourceFPS():
     version = xbmc.getInfoLabel('system.buildversion')
     if version[0:2] >= "17":
         videoFPSValue = xbmc.getInfoLabel('Player.Process(VideoFps)')
-        videoFileName = xbmc.getInfoLabel('Player.Filenameandpath')
+        videoFileName = xbmc.Player().getPlayingFile()
 
     # only save FPS if not 0.000 (seen on one dvd-iso)
     if videoFPSValue != '0.000':
@@ -127,7 +127,6 @@ def getSourceFPS():
     else:
         videoFPSValue = None
 
-    # xbmc.log("script.frequency.switcher - getSourceFPS(): videoFPSValue = " + videoFPSValue,level=xbmc.LOGNOTICE)
     return videoFileName, videoFPSValue
 
 def getPlatformType():
@@ -384,12 +383,8 @@ def getCurrentFPS():
         
         # FPS detected
         else:
-            #xbmc.log("script.frequency.switcher: getCurrentFPS: videoFPSValue     = " + videoFPSValue,level=xbmc.LOGNOTICE)
-            #xbmc.log("script.frequency.switcher: getCurrentFPS: videoFileNameLog  = " + videoFileNameLog,level=xbmc.LOGNOTICE)
-            #xbmc.log("script.frequency.switcher: getCurrentFPS: videoFileNamePlay = " + videoFileNamePlay,level=xbmc.LOGNOTICE)
-
             # log file name doesn't match currently playing video
-            if (videoFileNameLog != videoFileNamePlay) and (videoFileNameLog[0:6] != 'pvr://' ) and (videoFileNameLog[0:9] != 'plugin://' ):
+            if videoFileNameLog != videoFileNamePlay:
                 setModeStatus = 'Found source framerate for wrong video file.'
                 statusType = 'warn'
         
