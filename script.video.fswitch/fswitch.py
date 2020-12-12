@@ -8,16 +8,16 @@ import fswitch_config as fsconfig
 
 class Main:
     'main function - determine platform and process arguments'
- 
+
     @staticmethod
     def run():
-         
+
         scriptMode = None
 
         # if the only argument is script name then run in setup mode
         if len(sys.argv) == 1:
             scriptMode = 'Setup'
-  
+
         # otherwise select mode based on the first argument 
         else:
             scriptArg = sys.argv[1]
@@ -65,7 +65,7 @@ class Main:
         elif scriptMode == 'SetFreq':
             # set the output mode
             setModeStatus, statusType = fsutil.setDisplayMode(scriptArg)
-              
+
             # display notification
             if statusType == 'warn':
                 fsmsg.notifyQuickWarn('Frequency Switcher', setModeStatus)    
@@ -75,7 +75,7 @@ class Main:
         elif scriptMode == 'AutoSet':
             # set the output mode automatically
             setModeStatus, statusType = fsutil.setDisplayModeAuto()
-              
+
             # display notification
             if statusType == 'warn':
                 fsmsg.notifyQuickWarn('Frequency Switcher', setModeStatus)    
@@ -84,10 +84,10 @@ class Main:
 
         elif scriptMode == 'ShowInfo':
             fsconfigutil.loadActiveInfoSetting()
-            
+
             # disable info panel if currently active
             if fsconfig.activeInfo:
-          
+
                 # check that the active info panel flag file is not old (occurs if XBMC crashes)
                 if fsconfigutil.activeInfoFlagIsOld():
                     fswin.InfoPanel.showInfo()
@@ -96,11 +96,11 @@ class Main:
                 else:    
                     fsconfig.activeInfo = False
                     fsconfigutil.saveActiveInfoSetting()
-                
+
             # show info panel if not currently active    
             else:              
                 fswin.InfoPanel.showInfo()
-                
+
         else:
             fsmsg.notifyInfo('Invalid script argument', scriptArg)
 

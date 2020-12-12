@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.frequency.switcher" name="Frequency Switcher" version="2.1.1" provider-name="pmos69">
+<addon id="script.frequency.switcher" name="Frequency Switcher" version="2.1.2" provider-name="pmos69">
   <requires>
-    <import addon="xbmc.python" version="2.14.0"/>
-	<import addon="script.module.pyxbmct" version="1.1.2"/>
+        <trycatch>
+            <try>
+                <import addon="xbmc.python" version="3.0.0"/>
+            </try>
+
+            <catch>
+                <import addon="xbmc.python" version="2.14.0"/>
+            </catch>
+        </trycatch>
+    <import addon="script.module.pyxbmct" version="1.1.2"/>
   </requires>
   <extension point="xbmc.python.script" library="fswitch.py">
     <provides>video executable</provides>

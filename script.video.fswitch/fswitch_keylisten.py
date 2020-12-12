@@ -10,12 +10,12 @@ translate = xbmcaddon.Addon().getLocalizedString
 
 class KeyListener(xbmcgui.WindowXMLDialog):
     'function for getting pressed key code method and associated dialog window'
-    
+
     TIMEOUT = 8
-    
+
     KAITOAST_HEADING = 401
     KAITOAST_MESSAGE = 402
-    
+
     MSG_PRESSKEY = 30000
     MSG_TIMEOUT  = 30001
 
@@ -48,43 +48,43 @@ class KeyListener(xbmcgui.WindowXMLDialog):
 
         # set key pressed to none
         self.keyPressed = None
-        
+
         # get key pressed button code
         keyCode = action.getButtonCode()
 
         # check for a valid button code (ignore mouse input etc)
         if keyCode != 0:
-        
+
             # convert button code to a string
             self.keyPressed = str(keyCode)
-           
+
             # close dialog window
             self.close()
 
     @staticmethod
     def getKeyPressed():
-                      
+
         # create the dialog window 
         getkeyDialog = KeyListener()
-        
+
         # create a timer to close dialog window
         getkeyTimer = Timer(KeyListener.TIMEOUT, getkeyDialog.close)
-        
+
         # start the time
         getkeyTimer.start()
-        
+
         # show the dialog window and wait for it to close
         getkeyDialog.doModal()
-        
+
         # cancel the timer (if window closed before timer has ended)
         getkeyTimer.cancel()
-        
+
         # get the key pressed from the dialog window 
         keyPressed = getkeyDialog.keyPressed
-        
+
         # destroy the dialog window object
         del getkeyDialog
-        
+
         # return the key pressed
         return keyPressed
 

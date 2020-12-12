@@ -11,13 +11,13 @@ class ServiceMain:
  
     @staticmethod
     def run():
-    
+
         # load settings
         loadSettingsStatus = fsconfigutil.loadSettings()
 
         # check whether service should be activated
         if fsconfig.radioOnPlayStart:
-        
+
             # record service as active
             fsconfig.activeService = True
             fsconfigutil.saveActiveServiceSetting()
@@ -26,7 +26,8 @@ class ServiceMain:
             fsplayer = fsplay.fsPlayer()
 
             # check for configuration changes every four seconds
-            while not xbmc.abortRequested and fsconfig.radioOnPlayStart:
+            monitor_abort = xbmc.Monitor()  # For Kodi >= 14
+            while not monitor_abort.abortRequested()  and fsconfig.radioOnPlayStart:
 
                 xbmc.sleep(4000)
 
@@ -34,19 +35,19 @@ class ServiceMain:
                 fsconfig.radioOnPlayStart = fsconfigutil.useServiceFlagGet()
 
                 fsconfigutil.loadServiceConfig()
-    
+
         # check that service flagged as 'not used' is not also flagged as 'active' (can happen when clean up not run prior to reinstall)
         else:
             fsconfigutil.loadActiveServiceSetting()
-    
+
         # service is finished - record service as not active
         if fsconfig.activeService:
-            
+
             fsconfig.activeService = False
             fsconfigutil.saveActiveServiceSetting()
 
 # only run main function if module is running directly (i.e. not imported)
 if __name__ == '__main__':
-    
+
     ServiceMain.run()
 

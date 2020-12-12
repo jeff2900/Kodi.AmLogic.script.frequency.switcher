@@ -5,7 +5,7 @@ import fswitch_config as fsconfig
 
 class fsPlayer(xbmc.Player):
     ' player subclass'
-    
+
     def __init__(self):
         super(xbmc.Player, self).__init__()
 
@@ -23,7 +23,7 @@ class fsPlayer(xbmc.Player):
 
                     # set the output mode automatically
                     setModeStatus, statusType = fsutil.setDisplayModeAuto()
-                  
+
                     # video not started - wait, then retry
                     if (setModeStatus == 'No playing video detected.'):
                         xbmc.sleep(400)
@@ -38,7 +38,7 @@ class fsPlayer(xbmc.Player):
                     fsmsg.notifyQuickWarn('Frequency Switcher', setModeStatus)    
                 else:
                     fsmsg.notifyInfo('Frequency Switcher', setModeStatus)
-    
+
         else:
             fsconfig.lastPlayedMediaType = 'audio'
 
@@ -49,7 +49,7 @@ class fsPlayer(xbmc.Player):
         self.onPlayBackEndedOrStopped()
         
     def onPlayBackEndedOrStopped(self):
-    
+
         # only switch on video files (not audio)
         if fsconfig.lastPlayedMediaType == 'video':
 
@@ -57,29 +57,29 @@ class fsPlayer(xbmc.Player):
 
                 # check current display mode setting
                 currentOutputMode, currentAmlogicMode = fsutil.getDisplayMode()
-                
+
                 if currentOutputMode == 'unsupported':
                     setModeStatus = 'Unsupported resolution: ' + currentAmlogicMode           
                     statusType = 'warn'
-                        
+
                 elif currentOutputMode == 'invalid':
                     setModeStatus = 'Error, unexpected mode: ' + currentAmlogicMode       
                     statusType = 'warn'
-                    
+
                 else:
                     # get current resolution
                     resSplit = currentOutputMode.find('-')
                     currentRes = currentOutputMode[0:resSplit]
-    
+
                     # set the output mode
                     if fsconfig.radioOnPlayStop60:
                         setModeStatus, statusType = fsutil.setDisplayMode(currentRes + '-60hz')
                     else:
                         setModeStatus, statusType = fsutil.setDisplayMode(currentRes + '-50hz')
-                  
+
                 # display notification
                 if statusType == 'warn':
                     fsmsg.notifyQuickWarn('Frequency Switcher', setModeStatus)    
                 else:
                     fsmsg.notifyInfo('Frequency Switcher', setModeStatus)
-        
+

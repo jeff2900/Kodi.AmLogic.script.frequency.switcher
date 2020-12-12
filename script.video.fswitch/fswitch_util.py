@@ -19,7 +19,7 @@ def getSourceFPS():
     # initialize return values
     videoFileName = None
     videoFPSValue = None
-    
+
     # get location of log file
     if fsconfig.osPlatform[0:7] == 'Windows':
         logFileName = xbmc.translatePath('special://home\kodi.log')
@@ -33,83 +33,7 @@ def getSourceFPS():
 
     # wait 0.40 second for log file to update (with debug on W7: 0.35 not quite long enough for some files)
     xbmc.sleep(400)
-    
-    # open log file as read only
-    with open(logFileName, 'r') as logFile:
-        
-        # move pointer to the EOF
-        logFile.seek(0, 2)
-        
-        # get pointer location as the file size
-        logFileSize = logFile.tell()
-        
-        # move pointer to 40k characters before EOF (or to BOF)   
-        logFile.seek(max(logFileSize - 40000, 0), 0)
-        
-        # create list of lines from pointer to EOF
-        logFileLines = logFile.readlines()
-    
-    # slice list to include just the last 1000 lines (with debug on W7: 200=10sec, 600=30sec, 800=45sec, 1000=2min40sec)
-    logFileLines = logFileLines[-1000:]
-    
-    # reverse the list so most recent entry is first
-    logFileLines.reverse() 
-    
-    # parse the list (from most recent backwards)
-    for logFileIndex, logFileLine in enumerate(logFileLines):
 
-        # find reference to video opening
-        if refVideoOpen in logFileLine:
-        
-            # find start of video file name  
-            linePointer = logFileLine.find(refVideoOpen) + len(refVideoOpen)
-            
-            # read video file name
-            videoFileName = logFileLine[linePointer:].rstrip('\n')
-
-            # Now find the FPS
-            
-            # slice new list at current index
-            logFileLines2 = logFileLines[:logFileIndex]
-
-            # reverse list2 so oldest entry is first
-            logFileLines2.reverse() 
-            
-            # parse list2 (from video opening reference forward)
-            for logFileLine2 in logFileLines2:
-
-                # find reference to FPS
-                if refVideoFPSstart in logFileLine2:
-                
-                    # find start and end of FPS value
-                    linePointerStart = logFileLine2.find(refVideoFPSstart) + len(refVideoFPSstart)
-                    linePointerEnd = logFileLine2.find(refVideoFPSend)
-
-                    # read FPS value
-                    videoFPSValue = logFileLine2[linePointerStart:linePointerEnd]
-
-                    # truncate FPS to three decimal places
-                    decSplit = videoFPSValue.find('.') + 4
-                    videoFPSValue = videoFPSValue[0:decSplit]
-
-                    # only save FPS if not 0.000 (seen on one dvd-iso)
-                    if videoFPSValue != '0.000':
-
-                        # save FPS for use in setDisplayModeAuto
-                        fsconfig.lastDetectedFps = videoFPSValue
-                        fsconfig.lastDetectedFile = videoFileName
-                        fsconfigutil.saveLastDetectedFps()
-
-                        # found FPS - stop parsing list2
-                        break
-
-                    # FPS is 0.000 - treat as not found
-                    else:
-                        videoFPSValue = None
-
-            # found video open and FPS (if not 0.000) - stop parsing the list
-            break
-                             
     # check osPlatform linux2 (Krypton) 
     osPlatform, osVariant = getPlatformType()
 
@@ -117,6 +41,82 @@ def getSourceFPS():
     if version[0:2] >= "17":
         videoFPSValue = xbmc.getInfoLabel('Player.Process(VideoFps)')
         videoFileName = xbmc.Player().getPlayingFile()
+    else:
+        # open log file as read only
+        with open(logFileName, 'r') as logFile:
+
+            # move pointer to the EOF
+            logFile.seek(0, 2)
+
+            # get pointer location as the file size
+            logFileSize = logFile.tell()
+
+            # move pointer to 40k characters before EOF (or to BOF)   
+            logFile.seek(max(logFileSize - 40000, 0), 0)
+
+            # create list of lines from pointer to EOF
+            logFileLines = logFile.readlines()
+
+        # slice list to include just the last 1000 lines (with debug on W7: 200=10sec, 600=30sec, 800=45sec, 1000=2min40sec)
+        logFileLines = logFileLines[-1000:]
+
+        # reverse the list so most recent entry is first
+        logFileLines.reverse() 
+
+        # parse the list (from most recent backwards)
+        for logFileIndex, logFileLine in enumerate(logFileLines):
+
+            # find reference to video opening
+            if refVideoOpen in logFileLine:
+
+                # find start of video file name  
+                linePointer = logFileLine.find(refVideoOpen) + len(refVideoOpen)
+            
+                # read video file name
+                videoFileName = logFileLine[linePointer:].rstrip('\n')
+
+                # Now find the FPS
+
+                # slice new list at current index
+                logFileLines2 = logFileLines[:logFileIndex]
+
+                # reverse list2 so oldest entry is first
+                logFileLines2.reverse() 
+
+                # parse list2 (from video opening reference forward)
+                for logFileLine2 in logFileLines2:
+
+                    # find reference to FPS
+                    if refVideoFPSstart in logFileLine2:
+
+                        # find start and end of FPS value
+                        linePointerStart = logFileLine2.find(refVideoFPSstart) + len(refVideoFPSstart)
+                        linePointerEnd = logFileLine2.find(refVideoFPSend)
+
+                        # read FPS value
+                        videoFPSValue = logFileLine2[linePointerStart:linePointerEnd]
+
+                        # truncate FPS to three decimal places
+                        decSplit = videoFPSValue.find('.') + 4
+                        videoFPSValue = videoFPSValue[0:decSplit]
+
+                        # only save FPS if not 0.000 (seen on one dvd-iso)
+                        if videoFPSValue != '0.000':
+
+                            # save FPS for use in setDisplayModeAuto
+                            fsconfig.lastDetectedFps = videoFPSValue
+                            fsconfig.lastDetectedFile = videoFileName
+                            fsconfigutil.saveLastDetectedFps()
+
+                            # found FPS - stop parsing list2
+                            break
+
+                        # FPS is 0.000 - treat as not found
+                        else:
+                            videoFPSValue = None
+
+                # found video open and FPS (if not 0.000) - stop parsing the list
+                break
 
     # only save FPS if not 0.000 (seen on one dvd-iso)
     if videoFPSValue != '0.000':
@@ -137,7 +137,7 @@ def getPlatformType():
     if osPlatform == 'win32':
         osVariant = platform.system() + ' ' + platform.release()
 
-    elif (osPlatform == 'linux2' or osPlatform == 'linux3' or osPlatform == 'linux4') and os.path.isfile("/sys/class/display/mode"):
+    elif (osPlatform[0:5] == 'linux') and os.path.isfile("/sys/class/display/mode"):
         try:
             productBrand = subprocess.Popen(['getprop', 'ro.product.brand'], stdout=subprocess.PIPE).communicate()[0].strip()
             productDevice = subprocess.Popen(['getprop', 'ro.product.device'], stdout=subprocess.PIPE).communicate()[0].strip()
@@ -155,15 +155,15 @@ def getDisplayMode():
     modeFile = None
     outputMode = None
     amlogicMode = None
-    
+
     modeFileAndroid = "/sys/class/display/mode"
     modeFileWindows = "d:\\x8mode.txt"
-	
+
     if fsconfig.osPlatform[0:7] == 'Windows':
         modeFile = modeFileWindows 
     else:
         modeFile = modeFileAndroid
-      
+
     # check file exists
     if os.path.isfile(modeFile):
         # check file is writable
@@ -200,7 +200,7 @@ def getDisplayMode():
                     outputMode = '4k2k-24hz'
                 else:
                     outputMode = "unsupported"
-                
+
             if amlogicMode == '':
                 outputMode = "invalid"
                 amlogicMode = 'Mode file read, but is empty.'
@@ -254,10 +254,10 @@ def setDisplayMode(newOutputMode):
     if fileStatus[:2] != 'OK':
         setModeStatus = fileStatus
         statusType = 'warn'
- 
+
     # display/mode file is writable
     else:
-        
+
         # convert output mode to a valid AMLOGIC mode
         if newOutputMode == '1080p-60hz':
             newAmlogicMode = '1080p60hz'
@@ -287,7 +287,7 @@ def setDisplayMode(newOutputMode):
             setModeStatus = 'Unsupported mode requested.'
             statusType = 'warn'
             return setModeStatus, statusType
-          
+
         # check current display mode setting
         currentOutputMode, currentAmlogicMode = getDisplayMode()
                
@@ -307,7 +307,7 @@ def setDisplayMode(newOutputMode):
         if currentOutputMode == newOutputMode:
             setModeStatus = 'Frequency already set to ' + newFreq 
             statusType = 'warn'
-       
+
         # current output mode is different to new output mode
         else:
             
@@ -315,11 +315,11 @@ def setDisplayMode(newOutputMode):
             if newRes != currentRes:
                 setModeStatus = 'Resolution changed, please reconfigure'
                 statusType = 'warn'
-             
+
             # new resolution is the same as the current resolution
             else: 
                 fsconfigutil.loadLastFreqChangeSetting()
-             
+
                 # check that at least 4 seconds has elapsed since the last frequency change
                 secToNextFreqChange = 4 - (int(time.time()) - fsconfig.lastFreqChange)
                 if secToNextFreqChange > 1:
@@ -365,34 +365,34 @@ def getCurrentFPS():
 
         # check last detected info (before reading the log file)
         fsconfigutil.loadLastDetectedFps()
-         
+
         # last detected file name matches currently playing video, so use last detected FPS
         if fsconfig.lastDetectedFile == videoFileNamePlay:
             videoFileNameLog = fsconfig.lastDetectedFile
             videoFPSValue = fsconfig.lastDetectedFps
-        
+
         # FPS not stored as last detected FPS
         else:
             # read FPS from XBMC log
             videoFileNameLog, videoFPSValue = getSourceFPS()
-        
+
         # FPS not detected
         if videoFPSValue is None:
             setModeStatus = 'Failed to get source framerate.'
             statusType = 'warn'
-        
+
         # FPS detected
         else:
             # log file name doesn't match currently playing video
             if videoFileNameLog != videoFileNamePlay:
                 setModeStatus = 'Found source framerate for wrong video file.'
                 statusType = 'warn'
-        
+
             # log file name matches currently playing video
             else:
                 setModeStatus = videoFPSValue
                 statusType = 'ok'
-    
+
     return setModeStatus, statusType
 
 def setDisplayModeAuto():
@@ -400,29 +400,29 @@ def setDisplayModeAuto():
 
     # check current display mode setting
     currentOutputMode, currentAmlogicMode = getDisplayMode()
-    
+
     if currentOutputMode == 'unsupported':
         setModeStatus = 'Unsupported resolution: ' + currentAmlogicMode           
         statusType = 'warn'
-            
+
     elif currentOutputMode == 'invalid':
         setModeStatus = 'Error, unexpected mode: ' + currentAmlogicMode       
         statusType = 'warn'
-        
+
     else:
         # load auto sync settings
         fsconfigutil.loadAutoSyncSettings()
-        
+
         # get current resolution
         resSplit = currentOutputMode.find('-')
         currentRes = currentOutputMode[0:resSplit]
-            
+
         mode60hz = currentRes + '-60hz'
         mode50hz = currentRes + '-50hz'
         mode30hz = currentRes + '-30hz'
         mode25hz = currentRes + '-25hz'
         mode24hz = currentRes + '-24hz'
-        
+
         autoSync = []
 
         syncConfig = []        
@@ -443,7 +443,7 @@ def setDisplayModeAuto():
                                (fsconfig.edit30hzFps2, mode30hz), 
                                (fsconfig.edit30hzFps3, mode30hz), 
                                (fsconfig.edit30hzFps4, mode30hz)])
-             
+
         if fsconfig.radioAuto25hz:
             syncConfig.extend([(fsconfig.edit25hzFps1, mode25hz), 
                                (fsconfig.edit25hzFps2, mode25hz), 
@@ -466,20 +466,20 @@ def setDisplayModeAuto():
             statusType = 'warn'
 
         else:
-    
+
             # get FPS of currently playing video
             setModeStatus, statusType = getCurrentFPS()
-            
+
             if statusType == 'ok':
                 videoFPSValue = setModeStatus
-    
+
                 # search auto sync list for FPS
                 fpsFoundInSyncList = False
                 for (syncFPS, syncFreq) in autoSync:
                     if syncFPS == videoFPSValue:
                         fpsFoundInSyncList = True
                         break
-                
+
                 # FPS not found configured in auto sync list
                 if not fpsFoundInSyncList:
                     setModeStatus = 'Source framerate not configured: ' + videoFPSValue                        
@@ -487,7 +487,7 @@ def setDisplayModeAuto():
 
                 # FPS found in auto sync list       
                 else:
-                    
+
                     # check for unsupported mode '720p-24hz'
                     if syncFreq == '720p-24hz':
                         setModeStatus = syncFreq + ' is not supported'
@@ -496,7 +496,7 @@ def setDisplayModeAuto():
                     else:
                         # set the output mode
                         setModeStatus, statusType = setDisplayMode(syncFreq)
-                            
+
     return setModeStatus, statusType
 
 def mapKey(keyScope, keyMappings):
@@ -508,20 +508,20 @@ def mapKey(keyScope, keyMappings):
     keyMiddle = '">runaddon(script.frequency.switcher,'
     keyEnd = ')</key>'
     mapEnd = '</keyboard></global></keymap>'  
-    
+
     keyMap = mapStart
     for (keyCode, keyFunction) in keyMappings:
         keyMap = keyMap + keyStart + keyCode + keyMiddle + keyFunction + keyEnd
     keyMap = keyMap + mapEnd
-       
+
     # key map file
     keymapFolder = xbmc.translatePath('special://userdata/keymaps')
     keymapFile = os.path.join(keymapFolder, 'zswitch.xml')
- 
+
     # create keymap folder if it doesn't already exist
     if not os.path.exists(keymapFolder):
         os.makedirs(keymapFolder)
-         
+
     # create or overwrite keymap file
     try:
         with open(keymapFile, 'w') as keymapFileHandle: 
@@ -529,7 +529,7 @@ def mapKey(keyScope, keyMappings):
         mapKeyStatus = 'Keys activated'
     except Exception:
         mapKeyStatus = 'Failed to activate keys'
-          
+
     # load updated key maps
     xbmc.executebuiltin('action(reloadkeymaps)')
 
@@ -545,7 +545,7 @@ def mapKeyReset():
     if not os.path.isfile(keymapFile):
         mapKeyResetStatus = 'No keys currently active'
         return mapKeyResetStatus
-        
+
     # delete key map file
     try:
         os.remove(keymapFile)
@@ -559,7 +559,7 @@ def mapKeyReset():
     return mapKeyResetStatus
 
 def mapKeyActive():
-   
+
     # key map file
     keymapFolder = xbmc.translatePath('special://userdata/keymaps')
     keymapFile = os.path.join(keymapFolder, 'zswitch.xml')
@@ -574,5 +574,5 @@ def getPlayingVideo():
         videoFileName = xbmc.Player().getPlayingFile() 
     else:
         videoFileName = None
-        
+
     return videoFileName

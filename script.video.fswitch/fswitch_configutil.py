@@ -3,7 +3,13 @@ import xbmcaddon
 import os
 import calendar
 import time
-import cPickle as pickle
+
+try:  # Python 2
+    import cPickle as pickle
+
+except ImportError:  # Python 3
+    import _pickle as pickle
+
 import fswitch_config as fsconfig
 
 def settingsFolder():
@@ -19,7 +25,7 @@ def settingsFile():
     globalSettingsFolder = settingsFolder()
     globalSettingsFile = os.path.join(globalSettingsFolder, 'global_settings.p')
     return globalSettingsFile
- 
+
 def settingsLastFpsFile():
     # last FPS settings file
     globalSettingsFolder = settingsFolder()
@@ -46,17 +52,17 @@ def settingsServiceConfigFile():
 
 
 def createAllSettingsFiles():
-    
+
     # create settings folder if it doesn't already exist
     golbalSettingsFolder = settingsFolder()
     if not os.path.isdir(golbalSettingsFolder):
         os.makedirs(golbalSettingsFolder)
-    
+
     # create settings files if they don't already exist
     globalSettingsFile = settingsFile()
     if not os.path.isfile(globalSettingsFile):
         resetSettingsFile()
-        
+
     globalLastFps = settingsLastFpsFile()
     if not os.path.isfile(globalLastFps):
         resetLastDetectedFpsFile()
@@ -80,23 +86,23 @@ def deleteAllSettingsFiles():
         globalSettingsFile = settingsFile()
         if os.path.isfile(globalSettingsFile):
             os.remove(globalSettingsFile)
-             
+
         globalLastFps = settingsLastFpsFile()
         if os.path.isfile(globalLastFps):
             os.remove(globalLastFps)
-     
+
         globalLastChange = settingsLastChangeFile()
         if os.path.isfile(globalLastChange):
             os.remove(globalLastChange)
-     
+
         globalAutoSync = settingsAutoSyncFile()
         if os.path.isfile(globalAutoSync):
             os.remove(globalAutoSync)
-     
+
         globalServiceConfig = settingsServiceConfigFile()
         if os.path.isfile(globalServiceConfig):
             os.remove(globalServiceConfig)
-            
+
         infoStateFlagFile = activeInfoFlagFile()
         if os.path.isfile(infoStateFlagFile):
             os.remove(infoStateFlagFile)
@@ -117,10 +123,10 @@ def resetSettingsFile():
 
     # default settings
     fsSettings = {}
-    
+
     # platform
     fsSettings['osPlatform'] = 'unknown'
-    
+
     # key mapping
     fsSettings['radio60hz'] = False
     fsSettings['radio50hz'] = False
@@ -129,7 +135,7 @@ def resetSettingsFile():
     fsSettings['radio24hz'] = False
     fsSettings['radioAuto'] = False
     fsSettings['radioInfo'] = False
-    
+
     fsSettings['key60hz'] = ''
     fsSettings['key50hz'] = ''
     fsSettings['key30hz'] = ''
@@ -137,7 +143,7 @@ def resetSettingsFile():
     fsSettings['key24hz'] = ''
     fsSettings['keyAuto'] = ''
     fsSettings['keyInfo'] = ''
-    
+
     fsSettings['status60hz'] = ''
     fsSettings['status50hz'] = ''
     fsSettings['status30hz'] = ''
@@ -145,33 +151,33 @@ def resetSettingsFile():
     fsSettings['status24hz'] = ''
     fsSettings['statusAuto'] = ''
     fsSettings['statusInfo'] = ''
-    
+
     fsSettings['keymapRes'] = ''
-    
+
     # create or overwrite settings file
     try:
         with open(globalSettingsFile, 'wb') as settingsFileHandle: 
             pickle.dump(fsSettings, settingsFileHandle)
-                
+
         resetSettingsStatus = 'Reset settings'
     except Exception:
         resetSettingsStatus = 'Failed to reset settings'
-   
+
     resetLastDetectedFpsFile()
-    
+
     resetLastFreqChangeSettingFile()
-    
+
     resetAutoSyncSettingsFile()
-    
+
     resetServiceConfigFile()
-  
+
 def resetLastDetectedFpsFile():
 
     globalLastFps = settingsLastFpsFile()
-    
+
     # default settings
     fsSettings = {}
-    
+
     fsSettings['lastDetectedFps'] = ''
     fsSettings['lastDetectedFile'] = ''
 
@@ -179,7 +185,7 @@ def resetLastDetectedFpsFile():
     try:
         with open(globalLastFps, 'wb') as settingsFileHandle: 
             pickle.dump(fsSettings, settingsFileHandle)
-                
+
         resetSettingsStatus = 'Reset last FPS settings'
     except Exception:
         resetSettingsStatus = 'Failed to reset last FPS settings'
@@ -187,17 +193,17 @@ def resetLastDetectedFpsFile():
 def resetLastFreqChangeSettingFile():
 
     globalLastChange = settingsLastChangeFile()
-    
+
     # default settings
     fsSettings = {}
-    
+
     fsSettings['lastFreqChange'] = 0
-    
+
     # create or overwrite settings file
     try:
         with open(globalLastChange, 'wb') as settingsFileHandle: 
             pickle.dump(fsSettings, settingsFileHandle)
-                
+
         resetSettingsStatus = 'Reset last change time setting'
     except Exception:
         resetSettingsStatus = 'Failed to reset last change time setting'
@@ -205,27 +211,27 @@ def resetLastFreqChangeSettingFile():
 def resetAutoSyncSettingsFile():
 
     globalAutoSync = settingsAutoSyncFile()
-    
+
     # default settings
     fsSettings = {}
-    
+
     # auto-set configuration
     fsSettings['radioAuto60hz'] = True
     fsSettings['radioAuto50hz'] = True
     fsSettings['radioAuto30hz'] = False
     fsSettings['radioAuto25hz'] = False
     fsSettings['radioAuto24hz'] = True
-    
+
     fsSettings['edit60hzFps1'] = '59.940'
     fsSettings['edit60hzFps2'] = '29.970'
     fsSettings['edit60hzFps3'] = ''
     fsSettings['edit60hzFps4'] = ''
-    
+
     fsSettings['edit50hzFps1'] = '50.000'
     fsSettings['edit50hzFps2'] = '25.000'
     fsSettings['edit50hzFps3'] = ''
     fsSettings['edit50hzFps4'] = ''
-    
+
     fsSettings['edit30hzFps1'] = ''
     fsSettings['edit30hzFps2'] = ''
     fsSettings['edit30hzFps3'] = ''
@@ -235,17 +241,17 @@ def resetAutoSyncSettingsFile():
     fsSettings['edit25hzFps2'] = ''
     fsSettings['edit25hzFps3'] = ''
     fsSettings['edit25hzFps4'] = ''
-    
+
     fsSettings['edit24hzFps1'] = '24.000'
     fsSettings['edit24hzFps2'] = '23.976'
     fsSettings['edit24hzFps3'] = ''
     fsSettings['edit24hzFps4'] = ''
-    
+
     # create or overwrite settings file
     try:
         with open(globalAutoSync, 'wb') as settingsFileHandle: 
             pickle.dump(fsSettings, settingsFileHandle)
-                
+
         resetSettingsStatus = 'Reset auto sync settings'
     except Exception:
         resetSettingsStatus = 'Failed to reset auto sync settings'
@@ -261,7 +267,7 @@ def resetServiceConfigFile():
     fsSettings['radioOnPlayStop60'] = False
     fsSettings['radioOnPlayStop50'] = False
     fsSettings['radioNotifyOn'] = True
-    
+
     # create or overwrite settings file
     try:
         with open(globalServiceConfig, 'wb') as settingsFileHandle: 
@@ -271,12 +277,12 @@ def resetServiceConfigFile():
     except Exception:
         resetSettingsStatus = 'Failed to reset service configuration'
 
-   
+
 def loadSettings():
 
     # load service configuration (first to allow for fsmsg debugging)
     loadServiceConfig()
-    
+
     globalSettingsFile = settingsFile()
 
     # read settings file
@@ -295,7 +301,7 @@ def loadSettings():
             fsconfig.radio24hz = fsSettings['radio24hz']
             fsconfig.radioAuto = fsSettings['radioAuto']
             fsconfig.radioInfo = fsSettings['radioInfo']
-            
+
             fsconfig.key60hz = fsSettings['key60hz']
             fsconfig.key50hz = fsSettings['key50hz']
             fsconfig.key30hz = fsSettings['key30hz']
@@ -303,7 +309,7 @@ def loadSettings():
             fsconfig.key24hz = fsSettings['key24hz']
             fsconfig.keyAuto = fsSettings['keyAuto']
             fsconfig.keyInfo = fsSettings['keyInfo']
-            
+
             fsconfig.status60hz = fsSettings['status60hz']
             fsconfig.status50hz = fsSettings['status50hz']
             fsconfig.status30hz = fsSettings['status30hz']
@@ -311,9 +317,9 @@ def loadSettings():
             fsconfig.status24hz = fsSettings['status24hz']
             fsconfig.statusAuto = fsSettings['statusAuto']
             fsconfig.statusInfo = fsSettings['statusInfo']
-        
+
             fsconfig.keymapRes = fsSettings['keymapRes']
-                 
+
         loadSettingsStatus = 'Loaded settings'
     except Exception:
         loadSettingsStatus = 'Failed to load settings'
@@ -351,7 +357,7 @@ def saveSettings():
     fsSettings['key24hz'] = fsconfig.key24hz
     fsSettings['keyAuto'] = fsconfig.keyAuto
     fsSettings['keyInfo'] = fsconfig.keyInfo
-    
+
     fsSettings['status60hz'] = fsconfig.status60hz
     fsSettings['status50hz'] = fsconfig.status50hz
     fsSettings['status30hz'] = fsconfig.status30hz
@@ -366,11 +372,11 @@ def saveSettings():
     try:
         with open(globalSettingsFile, 'wb') as settingsFileHandle: 
             pickle.dump(fsSettings, settingsFileHandle)
-                
+
         saveSettingsStatus = 'Settings saved'
     except Exception:
         saveSettingsStatus = 'Failed to save settings'
-   
+
     # save auto-set configuration
     saveAutoSyncSettings()
 
@@ -411,16 +417,16 @@ def saveLastDetectedFps():
     fsSettings = {}
     fsSettings['lastDetectedFps'] = fsconfig.lastDetectedFps
     fsSettings['lastDetectedFile'] = fsconfig.lastDetectedFile
-   
+
     # create or overwrite settings file
     try:
         with open(globalLastFps, 'wb') as settingsFileHandle: 
             pickle.dump(fsSettings, settingsFileHandle)
-                
+
         saveSettingsStatus = 'Last FPS saved'
     except Exception:
         saveSettingsStatus = 'Failed to save last FPS'
-   
+
     return saveSettingsStatus
 
 
@@ -446,23 +452,23 @@ def saveLastFreqChangeSetting():
     globalLastChange = settingsLastChangeFile()
 
     fsSettings = {}
-    
+
     fsSettings['lastFreqChange'] = fsconfig.lastFreqChange
 
     # create or overwrite settings file
     try:
         with open(globalLastChange, 'wb') as settingsFileHandle: 
             pickle.dump(fsSettings, settingsFileHandle)
-                
+
         saveSettingsStatus = 'Last change time saved'
     except Exception:
         saveSettingsStatus = 'Failed to save last change time'
-   
+
     return saveSettingsStatus
 
 
 def loadAutoSyncSettings():
-         
+
     globalAutoSync = settingsAutoSyncFile()
 
     # read settings file
@@ -476,17 +482,17 @@ def loadAutoSyncSettings():
             fsconfig.radioAuto30hz = fsSettings['radioAuto30hz']
             fsconfig.radioAuto25hz = fsSettings['radioAuto25hz']
             fsconfig.radioAuto24hz = fsSettings['radioAuto24hz']
-        
+
             fsconfig.edit60hzFps1 = fsSettings['edit60hzFps1']
             fsconfig.edit60hzFps2 = fsSettings['edit60hzFps2']
             fsconfig.edit60hzFps3 = fsSettings['edit60hzFps3']
             fsconfig.edit60hzFps4 = fsSettings['edit60hzFps4']
-        
+
             fsconfig.edit50hzFps1 = fsSettings['edit50hzFps1']
             fsconfig.edit50hzFps2 = fsSettings['edit50hzFps2']
             fsconfig.edit50hzFps3 = fsSettings['edit50hzFps3']
             fsconfig.edit50hzFps4 = fsSettings['edit50hzFps4']
-        
+
             fsconfig.edit30hzFps1 = fsSettings['edit30hzFps1']
             fsconfig.edit30hzFps2 = fsSettings['edit30hzFps2']
             fsconfig.edit30hzFps3 = fsSettings['edit30hzFps3']
@@ -496,12 +502,12 @@ def loadAutoSyncSettings():
             fsconfig.edit25hzFps2 = fsSettings['edit25hzFps2']
             fsconfig.edit25hzFps3 = fsSettings['edit25hzFps3']
             fsconfig.edit25hzFps4 = fsSettings['edit25hzFps4']
-        
+
             fsconfig.edit24hzFps1 = fsSettings['edit24hzFps1']
             fsconfig.edit24hzFps2 = fsSettings['edit24hzFps2']
             fsconfig.edit24hzFps3 = fsSettings['edit24hzFps3']
             fsconfig.edit24hzFps4 = fsSettings['edit24hzFps4']
-                 
+
         loadSettingsStatus = 'Loaded auto sync settings'
     except Exception:
         loadSettingsStatus = 'Failed to load auto sync settings'
@@ -550,16 +556,16 @@ def saveAutoSyncSettings():
     try:
         with open(globalAutoSync, 'wb') as settingsFileHandle: 
             pickle.dump(fsSettings, settingsFileHandle)
-                
+
         saveSettingsStatus = 'Auto sync settings saved'
     except Exception:
         saveSettingsStatus = 'Failed to save auto sync settings'
-   
+
     return saveSettingsStatus
 
   
 def loadServiceConfig():
-      
+
     globalServiceConfig = settingsServiceConfigFile()
 
     # read settings file
@@ -571,7 +577,7 @@ def loadServiceConfig():
             fsconfig.radioOnPlayStop60 = fsSettings['radioOnPlayStop60']
             fsconfig.radioOnPlayStop50 = fsSettings['radioOnPlayStop50']
             fsconfig.radioNotifyOn = fsSettings['radioNotifyOn']
-            
+
         loadSettingsStatus = 'Loaded service configuration'
     except Exception:
         loadSettingsStatus = 'Failed to load service configuration'
@@ -593,11 +599,11 @@ def saveServiceConfig():
     try:
         with open(globalServiceConfig, 'wb') as settingsFileHandle: 
             pickle.dump(fsSettings, settingsFileHandle)
-                
+
         saveSettingsStatus = 'Service configuration saved'
     except Exception:
         saveSettingsStatus = 'Failed to save service configuration'
-   
+
     return saveSettingsStatus
 
 
@@ -627,7 +633,7 @@ def saveActiveInfoSetting():
 
 
 def activeServiceFlagGet():
-    
+
     # active-service flag file
     serviceStateFlagFolder = settingsFolder()
     serviceStateFlagFile = os.path.join(serviceStateFlagFolder, 'fs_service_active')
@@ -639,32 +645,32 @@ def activeServiceFlagGet():
         return False
 
 def activeServiceFlagSet():
-    
+
     # active-service flag file
     serviceStateFlagFolder = settingsFolder()
     serviceStateFlagFile = os.path.join(serviceStateFlagFolder, 'fs_service_active')
 
     # check file does not already exist
     if not os.path.isfile(serviceStateFlagFile):
-        
+
         # create active-service flag file
         open(serviceStateFlagFile, 'w').close()
 
 def activeServiceFlagDel():
-    
+
     # active-service flag file
     serviceStateFlagFolder = settingsFolder()
     serviceStateFlagFile = os.path.join(serviceStateFlagFolder, 'fs_service_active')
 
     # check file exists
     if os.path.isfile(serviceStateFlagFile):
-        
+
         # delete active-service flag file
         os.remove(serviceStateFlagFile)
 
 
 def useServiceFlagGet():
-    
+
     # use-service flag file
     serviceStateFlagFolder = settingsFolder()
     serviceStateFlagFile = os.path.join(serviceStateFlagFolder, 'fs_use_service')
@@ -676,26 +682,26 @@ def useServiceFlagGet():
         return False
 
 def useServiceFlagSet():
-    
+
     # use-service flag file
     serviceStateFlagFolder = settingsFolder()
     serviceStateFlagFile = os.path.join(serviceStateFlagFolder, 'fs_use_service')
 
     # check file does not already exist
     if not os.path.isfile(serviceStateFlagFile):
-        
+
         # create use-service flag file
         open(serviceStateFlagFile, 'w').close()
 
 def useServiceFlagDel():
-    
+
     # use-service flag file
     serviceStateFlagFolder = settingsFolder()
     serviceStateFlagFile = os.path.join(serviceStateFlagFolder, 'fs_use_service')
 
     # check file exists
     if os.path.isfile(serviceStateFlagFile):
-        
+
         # delete use-service flag file
         os.remove(serviceStateFlagFile)
 
@@ -706,7 +712,7 @@ def activeInfoFlagFile():
     return infoStateFlagFile
 
 def activeInfoFlagIsOld():
-        
+
     # active info panel flag file
     infoStateFlagFile = activeInfoFlagFile()
 
@@ -727,13 +733,13 @@ def activeInfoFlagIsOld():
         # file is active - i.e. not older than four seconds
         else:
             return False
-        
+
     # file does not exist - treat as not old
     else:
         return False
 
 def activeInfoFlagGet():
-    
+
     # active info panel flag file
     infoStateFlagFile = activeInfoFlagFile()
 
@@ -744,25 +750,25 @@ def activeInfoFlagGet():
         return False
 
 def activeInfoFlagSet():
-    
+
     # active info panel flag file
     infoStateFlagFile = activeInfoFlagFile()
 
     # check file does not already exist - NOT NECESSARY AS NEED TO CONTINUALLY FLAG INFO PANEL AS ACTIVE WHILE RUNNING
     # if not os.path.isfile(infoStateFlagFile):
-        
+
     # create active-info flag file
     open(infoStateFlagFile, 'w').close()
 
 
 def activeInfoFlagDel():
-    
+
     # active info panel flag file
     infoStateFlagFile = activeInfoFlagFile()
 
     # check file exists
     if os.path.isfile(infoStateFlagFile):
-        
+
         # delete active-service flag file
         os.remove(infoStateFlagFile)
 
